@@ -42,8 +42,8 @@
 
                             <div class="custom-file">
 
-                                    <input type="file" class="custom-file-input"  accept="image/jpg image/jpeg image/png image/gif" for="customFile" @change="fileSelected" id="customFile">
-                                    <label class="custom-file-label">Profile Photo</label>
+                                    <input type="file" class="custom-file-input"  accept="image/jpg image/jpeg image/png image/gif" @change="fileSelected" id="customFile">
+                                    <label class="custom-file-label">{{ fileName }}</label>
                             </div>
                         </div>
 
@@ -81,7 +81,8 @@
                 city: null,
                 country: null,
                 file: null,
-                imageType: null
+                imageType: null,
+                fileName: 'Profile Photo'
             }
         },
         mounted: function() {
@@ -89,7 +90,9 @@
         },
         methods: {
             fileSelected: function(event) {
+                  console.log(event.target);
                   this.file = event.target.files[0];
+                  this.fileName = event.target.files[0].name;
                   this.imageType = event.target.files[0].type;
             },
             userRegister: function() {
