@@ -39,11 +39,41 @@
                         </div>
                         <div class="modal-body">
                             <div class="form-group row">
-                                <label for="inputTitle" class="col-sm-2 col-form-label">Title</label>
-                                <div class="col-sm-10">
+                                <label for="inputTitle" class="col-sm-3 col-form-label">Title<span class="text-danger">*</span></label>
+                                <div class="col-sm-9">
                                     <input type="text" v-model="newTitle" class="form-control" id="inputTitle" placeholder="title">
                                 </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="inputCategory" class="col-sm-3 col-form-label">Category<span class="text-danger">*</span></label>
+                                <div class="col-sm-9">
+                                    <select v-model="newCategory" class="form-control" id="inputCategory">
+                                        <option v-for="cat in categories" :value="cat.categoryId">
+                                            {{ cat.name }}
+                                        </option>
+                                    </select>
 
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="inputDescription" class="col-sm-3 col-form-label">Description<span class="text-danger">*</span></label>
+                                <div class="col-sm-9">
+                                    <textarea id="inputDescription" v-model="newDescription" class="form-control" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="inputDate" class="col-sm-3 col-form-label">Closing Date</label>
+                                <div class="col-sm-9">
+                                    <input class="form-control" v-model="newDate" type="datetime-local" value="2011-08-19T13:45:00" id="inputDate">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="inputDate" class="col-sm-3 col-form-label">Hero Photo<span class="text-danger">*</span></label>
+                                <div class="custom-file col-sm-9">
+
+                                    <input type="file" class="custom-file-input"  accept="image/jpg image/jpeg image/png image/gif" @change="fileSelected" id="customFile">
+                                    <label class="custom-file-label">{{ fileName }}</label>
+                                </div>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -75,19 +105,35 @@
 </template>
 
 <script>
+    import moment from 'moment';
     export default {
         data (){
             return {
                 error: "",
                 errorFlag: false,
                 petitions: [],
-                petition: []
+                petition: [],
+                categories: null,
+                newTitle: null,
+                newDescription: null,
+                newCategory: null,
+                newImage: null,
+                imageType: null,
+                newDate: null,
+                fileName: ''
             }
         },
         mounted: function() {
             this.getPetitions();
+            this.getCategories();
         },
         methods: {
+            fileSelected: function(event) {
+                console.log(event.target);
+                this.newImage = event.target.files[0];
+                this.fileName = event.target.files[0].name;
+                this.imageType = event.target.files[0].type;
+            },
             getPetitions: function() {
                 this.$http.get('http://localhost:4941/api/v1/petitions')
                     .then((response) => {
@@ -97,6 +143,75 @@
                         this.error = error;
                         this.errorFlag = true;
                     });
+            },
+            getCategories: function() {
+                this.$http.get('http://localhost:4941/api/v1/petitions/categories')
+                    .then((response) => {
+                        this.categories = response.data;
+                    }).catch((err) => {});
+
+
+            },
+            uploadImage: function(petId) {
+                this.$http.put(`http://localhost:4941/api/v1/petitions/${petId}/photo`,
+                    this.newImage,
+                    { headers: {
+                        "X-Authorization": this.$cookies.get('token'),
+                            "Content-Type": this.imageType }})
+                    .then((response) => {}).catch((err) => {})
+            },
+            checkDate: function() {
+                if (this.newDate != null) {
+                    let now = moment();
+                    let selectedDate = moment(this.newDate, moment.ISO_8601);
+                    if (selectedDate.diff(now) > 0) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                else {
+                    return true;
+                }
+            },
+            createPetition: function() {
+                if (this.newTitle == null || this.title == '') {
+                    alert('You need to enter a title first');
+                }
+                else if (this.newCategory == null) {
+                    alert('You need to enter a title first');
+                }
+                else if (this.newImage == null) {
+                    alert('You need to add an image first');
+                }
+                else if (!this.checkDate(this.newDate)) {
+                    alert('The closing date must be in the future');
+                }
+                else {
+                    let data = {
+                        title: this.newTitle,
+                        description: this.newDescription,
+
+                        categoryId: this.newCategory
+                    };
+                    if (this.newDate != null) {
+                        data.closingDate = this.newDate.replace('T', ' ')
+                    }
+                    this.$http.post('http://localhost:4941/api/v1/petitions',
+                        data,
+                        { headers: {"X-Authorization": this.$cookies.get('token')}})
+                        .then((response) => {
+                            let petId = response.data.petitionId;
+                            console.log(petId);
+                            this.uploadImage(petId);
+                            $('#createPetitionModal').modal('hide');
+                            this.$router.push({name: 'petition', params: { id: petId }});
+                        }).catch((err) => {
+
+                    });
+
+                }
             }
         }
     };

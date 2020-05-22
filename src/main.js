@@ -4,9 +4,12 @@ import Petition from './Petition.vue';
 import Login from './Login.vue';
 import Logout from './Logout.vue'
 import Register from './Register.vue';
+
 import App from './App.vue';
 import Home from './Home.vue';
 import Users from './Users.vue';
+
+
 
 import axios from 'axios';
 import VueAxios from 'vue-axios';

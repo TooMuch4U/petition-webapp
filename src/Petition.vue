@@ -2,7 +2,7 @@
     <div>
 
 
-        <div id="petition" class="container">
+        <div id="petition" class="container" v-if="petition != null">
             <div v-if="errorFlag" style="color: red;">
                 {{ error }}
             </div>
@@ -117,7 +117,7 @@
             return {
                 error: "",
                 errorFlag: false,
-                petition: {},
+                petition: null,
                 signatures: {}
             }
         },
@@ -128,10 +128,12 @@
             getOnePetition: function(id) {
                 this.$http.get('http://localhost:4941/api/v1/petitions/' + id)
                     .then((response) => {
+                        console.log(response.data);
                         this.petition = response.data;
                         this.getSignatures(this.$route.params.id)
                     })
                     .catch((error) => {
+                        console.log(error);
                         this.error = error;
                         this.errorFlag = true;
                     });
@@ -150,6 +152,7 @@
                 if (image == 'hi') {
                     image = '/assets/default.jpg';
                 }
+
                 return 'http://localhost:4941/api/v1/users/' + userId + '/photo';
             }
         }
