@@ -82,7 +82,8 @@
                 country: null,
                 file: null,
                 imageType: null,
-                fileName: 'Profile Photo'
+                fileName: 'Profile Photo',
+                token: null
             }
         },
         mounted: function() {
@@ -90,7 +91,6 @@
         },
         methods: {
             fileSelected: function(event) {
-                  console.log(event.target);
                   this.file = event.target.files[0];
                   this.fileName = event.target.files[0].name;
                   this.imageType = event.target.files[0].type;
@@ -121,9 +121,6 @@
                         userData)
                         .then((response) => {
                             this.userLogin();
-                            if (this.file != null) {
-                                this.uploadPhoto();
-                            }
                             this.$router.push('/').catch((err) => {});
                         })
                         .catch((err) => {
@@ -136,8 +133,12 @@
             userLogin: function() {
                 this.$http.post('http://localhost:4941/api/v1/users/login', { email: this.email, password: this.password})
                     .then((response) => {
+                        this.token = response.data.token;
                         this.$cookies.set('token', response.data.token);
                         this.$cookies.set('userId', response.data.userId);
+                        if (this.file != null) {
+                            this.uploadPhoto();
+                        }
                     })
                     .catch((err) => {
                         this.error = err;
@@ -145,6 +146,7 @@
                     });
             },
             uploadPhoto: function() {
+                console.log(this.$cookies.get('token'));
                 this.$http.put('http://localhost:4941/api/v1/users/' + this.$cookies.get('userId') + '/photo',
                      this.file,
                     { headers: {"X-Authorization": this.$cookies.get('token'),
