@@ -4,11 +4,15 @@
 
     <div id="petitions" class="container" >
         <div class="row">
-            <div class="col-12">
-                <h2>Petitions</h2>
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createPetitionModal">
-                    Create Petition
-                </button>
+            <div class="col-8 offset-2">
+                <h2>
+                    Petitions
+                    <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#createPetitionModal">
+                        Create Petition
+                    </button>
+
+                </h2>
+
             </div>
         </div>
 
@@ -175,6 +179,12 @@
                     return true;
                 }
             },
+            signPetition: function(petId) {
+                this.$http.post(`http://localhost:4941/api/v1/petitions/${petId}/signatures`, {},
+                    { headers: {
+                            "X-Authorization": this.$cookies.get('token')}})
+                    .then((response) => {}).catch((err) => {});
+            },
             createPetition: function() {
                 if (this.newTitle == null || this.title == '') {
                     alert('You need to enter a title first');
@@ -203,10 +213,16 @@
                         { headers: {"X-Authorization": this.$cookies.get('token')}})
                         .then((response) => {
                             let petId = response.data.petitionId;
-                            console.log(petId);
                             this.uploadImage(petId);
-                            $('#createPetitionModal').modal('hide');
-                            this.$router.push({name: 'petition', params: { id: petId }});
+                            this.$http.post(`http://localhost:4941/api/v1/petitions/${petId}/signatures`, {},
+                                { headers: {
+                                        "X-Authorization": this.$cookies.get('token')}})
+                                .then((response) => {
+                                    $('#createPetitionModal').modal('hide');
+                                    this.$router.push({name: 'petition', params: { id: petId }});
+                                })
+                                .catch((err) => {});
+
                         }).catch((err) => {
 
                     });
