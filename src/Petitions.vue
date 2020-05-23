@@ -179,12 +179,6 @@
                     return true;
                 }
             },
-            signPetition: function(petId) {
-                this.$http.post(`http://localhost:4941/api/v1/petitions/${petId}/signatures`, {},
-                    { headers: {
-                            "X-Authorization": this.$cookies.get('token')}})
-                    .then((response) => {}).catch((err) => {});
-            },
             createPetition: function() {
                 if (this.newTitle == null || this.title == '') {
                     alert('You need to enter a title first');
