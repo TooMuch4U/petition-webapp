@@ -77,6 +77,7 @@
                         .then((response) => {
                             this.$cookies.set('token', response.data.token);
                             this.$cookies.set('userId', response.data.userId);
+                            this.$parent.forceRerender();
                             this.$router.push('/').catch((err) => {});
                         })
                         .catch((err) => {

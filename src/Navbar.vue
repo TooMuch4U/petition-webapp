@@ -8,12 +8,18 @@
 
             <div class="navbar-nav">
                 <router-link class="nav-item nav-link active" to="/petitions">Petitions</router-link>
-                <router-link class="nav-item nav-link active" to="/register">Register</router-link>
-                <router-link class="nav-item nav-link active" to="/login">Login</router-link>
 
             </div>
-            <div class="navbar-nav ml-auto">
+            <div v-if="$cookies.get('token')" class="navbar-nav ml-auto">
+                <router-link class="nav-item nav-link active" to="/profile">Profile</router-link>
+                <router-link class="nav-item nav-link active" to="/profile">/</router-link>
                 <router-link class="nav-item nav-link active" to="/logout">Logout</router-link>
+
+            </div>
+            <div v-else class="navbar-nav ml-auto">
+                <router-link class="nav-item nav-link active" to="/register">Register</router-link>
+                <router-link class="nav-item nav-link active" to="/register">/</router-link>
+                <router-link class="nav-item nav-link active" to="/login">Login</router-link>
             </div>
 
         </div>

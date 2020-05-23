@@ -45,12 +45,14 @@
                     .then((response) => {
                         this.$cookies.remove('token');
                         this.$cookies.remove('userId');
+                        this.$parent.forceRerender();
                         this.$router.push('/login');
                     })
                     .catch((error) => {
                         this.error = error;
                         this.errorFlag = true;
                     })
+
             }
         }
 

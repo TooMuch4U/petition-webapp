@@ -1,6 +1,6 @@
 <template>
   <div>
-    <navbar/>
+    <navbar :key="componentKey"/>
     <div id="app">
 
       <router-view></router-view>
@@ -17,9 +17,18 @@
     },
     data () {
       return {
-        cookieStatus: this.$cookies.get('token')
+        componentKey: 0
+      };
+    },
+    methods: {
+      forceRerender() {
+        this.componentKey += 1;
       }
-
+    },
+    events: {
+      eventName: function(data) {
+        // do stuff
+      }
     }
   }
 </script>
