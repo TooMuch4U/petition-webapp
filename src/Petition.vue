@@ -30,7 +30,7 @@
                 <div class="col-8 border-top py-2">
                     <button type="button" v-on:click="setupEdit" class="btn btn-primary float-left mx-1" data-toggle="modal"
                             data-target="#editPetitionModal">Edit Petition</button>
-                    <button type="button" class="btn btn-danger float-left" data-toggle="modal"
+                    <button type="button" v-on:click="setupDelete" class="btn btn-danger float-left" data-toggle="modal"
                             data-target="#deletePetitionModal">Delete</button>
                 </div>
 
@@ -202,7 +202,7 @@
                         <div class="form-group row">
                             <label for="inputDescription" class="col-sm-4 col-form-label">Description</label>
                             <div class="col-sm-8">
-                                <input type="text" v-model="newDesc" class="form-control" id="inputDescription">
+                                <textarea  v-model="newDesc" class="form-control" id="inputDescription" rows="3"></textarea>
                             </div>
                         </div>
                         <div class="form-group row">
@@ -252,6 +252,32 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="deletePetitionModal" tabindex="-1" role="dialog" aria-labelledby="deletePetitionLabel"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header ">
+                        <h5>Delete Petition</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-danger" v-if="deleteErrorFlag">
+                            {{ this.deleteError }}
+                        </div>
+
+                        <p>Are you sure you want to delete this petition?</p>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button v-on:click="deletePetition" class="btn btn-danger">Delete</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
     </div>
 
 
@@ -289,7 +315,9 @@
                 newFileType: null,
                 newDesc: null,
                 newDate: null,
-                catDict: {}
+                catDict: {},
+                deleteErrorFlag: false,
+                deleteError: ""
             }
         },
         mounted: function() {
@@ -505,6 +533,24 @@
                 reader2.readAsArrayBuffer(file);
                 this.newFileName = event.target.files[0].name;
                 this.newFileType = event.target.files[0].type;
+            },
+            setupDelete: function() {
+                this.deleteError = "";
+                this.deleteErrorFlag = false;
+            },
+            deletePetition: function() {
+                let petId = this.$route.params.id;
+                let token = this.$cookies.get('token');
+                this.$http.delete(`http://localhost:4941/api/v1/petitions/${petId}`,
+                    { headers: { "X-Authorization": token }})
+                    .then((response) => {
+                        $('#deletePetitionModal').modal('hide');
+                        this.$router.push({ name: 'petitions'});
+                    })
+                    .catch((err) => {
+                        this.deleteError = err.response.statusText;
+                        this.deleteErrorFlag = true;
+                    });
             },
 
             makeChanges: function() {
