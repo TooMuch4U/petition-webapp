@@ -4,6 +4,7 @@ import Petition from './Petition.vue';
 import Login from './Login.vue';
 import Logout from './Logout.vue'
 import Register from './Register.vue';
+import Profile from './Profile.vue';
 
 import App from './App.vue';
 import Home from './Home.vue';
@@ -52,14 +53,9 @@ const routes =  [
         component: Home
     },
     {
-        path: "/users/:userId",
-        name: "user",
-        component: Users
-    },
-    {
-        path: "/users",
-        name: "users",
-        component: Users
+        path: "/profile",
+        name: "profile",
+        component: Profile
     }
 ];
 const router = new VueRouter({

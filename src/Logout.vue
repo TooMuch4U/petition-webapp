@@ -6,8 +6,8 @@
                 <div class="alert alert-danger" v-if="errorFlag">
                     {{ this.error }}
                 </div>
-                <p>You are currently logged in as {{ name }}.</p>
-                <button v-on:click="userLogout()" class="btn btn-primary float-right">Logout</button>
+                <p>You are currently logged in as {{ name }}. Are you sure you want to logout?</p>
+                <button v-on:click="userLogout()" class="btn btn-primary">Logout</button>
 
             </div>
         </div>
