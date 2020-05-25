@@ -8,7 +8,6 @@ import Profile from './Profile.vue';
 
 import App from './App.vue';
 import Home from './Home.vue';
-import Users from './Users.vue';
 
 
 

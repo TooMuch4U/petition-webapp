@@ -8,6 +8,7 @@
         <div class="collapse navbar-collapse custom-margins" id="navbarCollapse">
 
             <div class="navbar-nav">
+                <router-link class="nav-item nav-link active" to="/">Home</router-link>
                 <router-link class="nav-item nav-link active" to="/petitions">Petitions</router-link>
 
             </div>
