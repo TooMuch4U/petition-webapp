@@ -7,27 +7,14 @@
             <div class="col-8 offset-2">
                 <h2>
                     Petitions
-                    <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#createPetitionModal">
-                        Create Petition
-                    </button>
-
                 </h2>
+
 
             </div>
         </div>
 
         <div class="row my-3">
-            <div class="col-2"></div>
-            <label for="sort" class="col-1 col-form-label">Sort By:</label>
-            <div class="col-sm-2">
-                <select v-model="sortBy" v-on:change="getPetitions" class="form-control" id="sort">
-                    <option value="SIGNATURES_DESC">Number of signatures descending</option>
-                    <option value="SIGNATURES_ASC">Number of signatures ascending</option>
-                    <option value="ALPHABETICAL_DESC">Alphabetically by title, Z - A</option>s
-                    <option value="ALPHABETICAL_ASC">Alphabetically by title, A - Z</option>
-
-                </select>
-            </div>
+            <div class="col-3"></div>
             <label for="searchCategory" class="col-1 col-form-label">Filter:</label>
             <div class="col-sm-2">
                 <select v-model="filterCat" v-on:change="getPetitions" class="form-control" id="searchCategory">
@@ -39,15 +26,39 @@
                     </option>
                 </select>
             </div>
+            <label for="sort" class="col-1 col-form-label">Sort By:</label>
+            <div class="col-sm-2">
+                <select v-model="sortBy" v-on:change="getPetitions" class="form-control" id="sort">
+                    <option value="SIGNATURES_DESC">Number of signatures descending</option>
+                    <option value="SIGNATURES_ASC">Number of signatures ascending</option>
+                    <option value="ALPHABETICAL_DESC">Alphabetically by title, Z - A</option>s
+                    <option value="ALPHABETICAL_ASC">Alphabetically by title, A - Z</option>
 
+                </select>
+            </div>
+
+        </div>
+
+        <div class="row my-3">
+            <div class="col-2"></div>
             <div class="col-sm-2">
                 <input type="text" v-model="searchTerm" v-on:input="getPetitions" class="form-control" @keyup.enter="getPetitions" id="inputSearch" placeholder="Search">
             </div>
+
+            <div class="form-check col-4 text-center">
+
+                <input type="checkbox" v-on:change="myPetitions" v-model="onlyMyPetitions" class="form-check-input" id="myPetitionsOnly">
+                <label class="form-check-label"   for="myPetitionsOnly">Show only my petitions</label>
+            </div>
+
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createPetitionModal">
+                Create Petition
+            </button>
         </div>
 
         <div class="row my-2">
             <div class="col-2"></div>
-            <div class="col-8">
+            <div class="col-8" v-if="total > 10">
                 <button class="btn btn-outline-dark" v-if="page != 1" v-on:click="changePage(1)">1</button>
                 <button class="btn btn-outline-dark" v-if="page > 2">...</button>
                 <button class="btn btn-outline-dark" v-if="page > 2" v-on:click="changePage(page-1)"><</button>
@@ -56,27 +67,42 @@
                 <button class="btn btn-outline-dark" v-if="(numPages - page) > 1">...</button>
                 <button class="btn btn-outline-dark" v-if="page != numPages" v-on:click="changePage(numPages)">{{ numPages }}</button>
             </div>
-            <div class="col-2"></div>
-        </div>
-
-        <div class="row text-left" v-for="petition in petitions">
-            <div class="col-2"></div>
-            <div class="col-2 border-top py-1">
-                <img class="img-fluid" :src="'http://localhost:4941/api/v1/petitions/' + petition.petitionId + '/photo'">
-            </div>
-            <div class="col-6 border-top ">
-
-                <h5><router-link :to="{ name: 'petition', params: { id: petition.petitionId }}">{{ petition.title }}</router-link></h5>
-                <p><strong>Author:</strong> {{ petition.authorName }}<br>
-                    <strong>Category:</strong> {{ petition.category }}<br>
-                <strong>Signatures:</strong> {{ petition.signatureCount }}</p>
-
+            <div class="col-8" v-else>
+                <button class="btn btn-dark" disabled >{{ page }}</button>
             </div>
             <div class="col-2"></div>
         </div>
+        <div class="row">
+            <div class="col-2"></div>
+
+            <div class="col-8">
+                <div class="container">
+                    <div class="row text-center">
+                        <div class="col-12 mt-2">
+                            <p>Showing {{ onPage }}  of {{ total }} petitions.</p>
+                        </div>
+                    </div>
+                    <div class="row text-left" v-for="petition in petitions">
+                        <div class="col-4 border-top py-1">
+                            <img class="img-fluid" :src="'http://localhost:4941/api/v1/petitions/' + petition.petitionId + '/photo'">
+                        </div>
+                        <div class="col-8 border-top ">
+
+                            <h5><router-link :to="{ name: 'petition', params: { id: petition.petitionId }}">{{ petition.title }}</router-link></h5>
+                            <p><strong>Author:</strong> {{ petition.authorName }}<br>
+                                <strong>Category:</strong> {{ petition.category }}<br>
+                                <strong>Signatures:</strong> {{ petition.signatureCount }}</p>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-2"></div>
+        </div>
+
         <div class="row my-2">
             <div class="col-2"></div>
-            <div class="col-8">
+            <div class="col-8" v-if="total > 10">
                 <button class="btn btn-outline-dark" v-if="page != 1" v-on:click="changePage(1)">1</button>
                 <button class="btn btn-outline-dark" v-if="page > 2">...</button>
                 <button class="btn btn-outline-dark" v-if="page > 2" v-on:click="changePage(page-1)"><</button>
@@ -84,6 +110,9 @@
                 <button class="btn btn-outline-dark" v-if="(numPages - page) > 1" v-on:click="changePage(page + 1)">></button>
                 <button class="btn btn-outline-dark" v-if="(numPages - page) > 1">...</button>
                 <button class="btn btn-outline-dark" v-if="page != numPages" v-on:click="changePage(numPages)">{{ numPages }}</button>
+            </div>
+            <div class="col-8" v-else>
+                <button class="btn btn-dark" disabled >{{ page }}</button>
             </div>
             <div class="col-2"></div>
         </div>
@@ -161,6 +190,28 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginLabel"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+
+                    <div>
+                        <div class="modal-header">
+                            <h5>Login</h5>
+                        </div>
+                        <div class="modal-body">
+                            <p>You must be logged in to do this.
+                                <router-link data-dismiss="modal" :to="{ name: 'login' }">Login</router-link></p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" v-on:click="onlyMyPetitions = false" class="btn btn-secondary" data-dismiss="modal">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -187,7 +238,9 @@
                 page: (this.$route.query.p == null ? 1 : parseInt(this.$route.query.p)),
                 total: null,
                 numPages: 1,
-                allPetitions: null
+                allPetitions: null,
+                onlyMyPetitions: false,
+                onPage: 0
             }
         },
         mounted: function() {
@@ -221,6 +274,14 @@
                     queryStrings = "sortBy=" + this.sortBy;
                 } else {
                     queryStrings = queryStrings + "&sortBy=" + this.sortBy;
+                }
+                if (this.onlyMyPetitions) {
+                    if (queryStrings == "") {
+                        queryStrings = "authorId=" + this.$cookies.get('userId');
+                    }
+                    else {
+                        queryStrings = queryStrings + "&authorId=" + this.$cookies.get('userId');
+                    }
                 }
                 let url = 'http://localhost:4941/api/v1/petitions';
                 if (queryStrings != '') {
@@ -319,6 +380,15 @@
                 let start = (count * (this.page - 1));
                 this.numPages = Math.ceil(this.total/count);
                 this.petitions = this.allPetitions.slice(start, (start + count));
+                this.onPage = (this.total == 0 ? 0 : start + 1) + ' - ' + ((start + count) > this.total ? this.total : start + count);
+            },
+            myPetitions: function() {
+                if (this.$cookies.get('token')) {
+                    this.getPetitions();
+                }
+                else {
+                    $('#loginModal').modal('show');
+                }
             }
         }
     };

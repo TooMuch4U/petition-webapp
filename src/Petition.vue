@@ -135,9 +135,9 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
 
-                    <div :key="updater" v-if="$cookies.get('token') == null">
+                    <div  v-if="$cookies.get('token') == null">
                         <div class="modal-header">
-                            <h5>Create Petition</h5>
+                            <h5>Sign Petition</h5>
                         </div>
                         <div class="modal-body">
                             <p>You must be logged in to sign a petition.

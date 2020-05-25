@@ -1,10 +1,11 @@
 <template>
+
     <nav class="navbar navbar-expand-md navbar-dark green-color sticky-top">
         <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse" id="navbarCollapse">
+        <div class="collapse navbar-collapse custom-margins" id="navbarCollapse">
 
             <div class="navbar-nav">
                 <router-link class="nav-item nav-link active" to="/petitions">Petitions</router-link>
@@ -41,5 +42,9 @@
 </script>
 
 <style scoped>
-
+    .custom-margins {
+        max-width: 720px;
+        margin-left: auto;
+        margin-right: auto;
+    }
 </style>

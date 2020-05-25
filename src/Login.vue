@@ -81,7 +81,7 @@
                             this.$router.push('/').catch((err) => {});
                         })
                         .catch((err) => {
-                            this.error = err;
+                            this.error = err.response.statusText;
                             this.errorFlag = true;
                         });
                 }

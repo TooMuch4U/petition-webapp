@@ -11,13 +11,13 @@
                         <div class="form-group row">
                             <label for="name" class="col-sm-2 col-form-label">Name<span class="text-danger">*</span></label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="name" v-model="name" placeholder="john">
+                                <input type="text" class="form-control" id="name" v-model="name" placeholder="name">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label for="email" class="col-sm-2 col-form-label">Email<span class="text-danger">*</span></label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="email" v-model="email" placeholder="example@email.com">
+                                <input type="text" class="form-control" id="email" v-model="email" placeholder="email">
                             </div>
                         </div>
                         <div class="form-group required row">
@@ -29,13 +29,13 @@
                         <div class="form-group row">
                             <label for="city" class="col-sm-2 col-form-label">City</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="city" v-model="city" placeholder="chirstchurch">
+                                <input type="text" class="form-control" id="city" v-model="city" placeholder="country">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label for="country" class="col-sm-2 col-form-label">Country</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="country" v-model="country" placeholder="new zealand">
+                                <input type="text" class="form-control" id="country" v-model="country" placeholder="country">
                             </div>
                         </div>
                         <div class="form-group row">
