@@ -16,9 +16,52 @@
             </div>
         </div>
 
+        <div class="row my-3">
+            <div class="col-2"></div>
+            <label for="sort" class="col-1 col-form-label">Sort By:</label>
+            <div class="col-sm-2">
+                <select v-model="sortBy" v-on:change="getPetitions" class="form-control" id="sort">
+                    <option value="SIGNATURES_DESC">Number of signatures descending</option>
+                    <option value="SIGNATURES_ASC">Number of signatures ascending</option>
+                    <option value="ALPHABETICAL_DESC">Alphabetically by title, Z - A</option>s
+                    <option value="ALPHABETICAL_ASC">Alphabetically by title, A - Z</option>
+
+                </select>
+            </div>
+            <label for="searchCategory" class="col-1 col-form-label">Filter:</label>
+            <div class="col-sm-2">
+                <select v-model="filterCat" v-on:change="getPetitions" class="form-control" id="searchCategory">
+
+                    <option disabled>Category Filter</option>
+                    <option selected :value="null">All</option>
+                    <option v-for="cat in categories" :value="cat.categoryId">
+                        {{ cat.name }}
+                    </option>
+                </select>
+            </div>
+
+            <div class="col-sm-2">
+                <input type="text" v-model="searchTerm" v-on:input="getPetitions" class="form-control" @keyup.enter="getPetitions" id="inputSearch" placeholder="Search">
+            </div>
+        </div>
+
+        <div class="row my-2">
+            <div class="col-2"></div>
+            <div class="col-8">
+                <button class="btn btn-outline-dark" v-if="page != 1" v-on:click="changePage(1)">1</button>
+                <button class="btn btn-outline-dark" v-if="page > 2">...</button>
+                <button class="btn btn-outline-dark" v-if="page > 2" v-on:click="changePage(page-1)"><</button>
+                <button class="btn btn-dark" disabled >{{ page }}</button>
+                <button class="btn btn-outline-dark" v-if="(numPages - page) > 1" v-on:click="changePage(page + 1)">></button>
+                <button class="btn btn-outline-dark" v-if="(numPages - page) > 1">...</button>
+                <button class="btn btn-outline-dark" v-if="page != numPages" v-on:click="changePage(numPages)">{{ numPages }}</button>
+            </div>
+            <div class="col-2"></div>
+        </div>
+
         <div class="row text-left" v-for="petition in petitions">
             <div class="col-2"></div>
-            <div class="col-2 border-top">
+            <div class="col-2 border-top py-1">
                 <img class="img-fluid" :src="'http://localhost:4941/api/v1/petitions/' + petition.petitionId + '/photo'">
             </div>
             <div class="col-6 border-top ">
@@ -28,6 +71,19 @@
                     <strong>Category:</strong> {{ petition.category }}<br>
                 <strong>Signatures:</strong> {{ petition.signatureCount }}</p>
 
+            </div>
+            <div class="col-2"></div>
+        </div>
+        <div class="row my-2">
+            <div class="col-2"></div>
+            <div class="col-8">
+                <button class="btn btn-outline-dark" v-if="page != 1" v-on:click="changePage(1)">1</button>
+                <button class="btn btn-outline-dark" v-if="page > 2">...</button>
+                <button class="btn btn-outline-dark" v-if="page > 2" v-on:click="changePage(page-1)"><</button>
+                <button class="btn btn-dark" disabled >{{ page }}</button>
+                <button class="btn btn-outline-dark" v-if="(numPages - page) > 1" v-on:click="changePage(page + 1)">></button>
+                <button class="btn btn-outline-dark" v-if="(numPages - page) > 1">...</button>
+                <button class="btn btn-outline-dark" v-if="page != numPages" v-on:click="changePage(numPages)">{{ numPages }}</button>
             </div>
             <div class="col-2"></div>
         </div>
@@ -124,13 +180,21 @@
                 newImage: null,
                 imageType: null,
                 newDate: null,
-                fileName: ''
+                fileName: '',
+                searchTerm: null,
+                filterCat: null,
+                sortBy: "SIGNATURES_DESC",
+                page: (this.$route.query.p == null ? 1 : parseInt(this.$route.query.p)),
+                total: null,
+                numPages: 1,
+                allPetitions: null
             }
         },
         mounted: function() {
             this.getPetitions();
             this.getCategories();
         },
+
         methods: {
             fileSelected: function(event) {
                 console.log(event.target);
@@ -139,9 +203,35 @@
                 this.imageType = event.target.files[0].type;
             },
             getPetitions: function() {
-                this.$http.get('http://localhost:4941/api/v1/petitions')
+
+                let queryStrings = "";
+                if (this.searchTerm != null && this.searchTerm != "") {
+                    queryStrings = 'q=' + this.searchTerm
+                }
+                if (this.filterCat != null) {
+                    if (queryStrings != "") {
+                        queryStrings = queryStrings + "&categoryId=" + this.filterCat;
+                    }
+                    else {
+                        queryStrings = "categoryId=" + this.filterCat;
+                    }
+
+                }
+                if (queryStrings == "") {
+                    queryStrings = "sortBy=" + this.sortBy;
+                } else {
+                    queryStrings = queryStrings + "&sortBy=" + this.sortBy;
+                }
+                let url = 'http://localhost:4941/api/v1/petitions';
+                if (queryStrings != '') {
+                    url = url + '?' + queryStrings;
+                }
+
+                this.$http.get(url)
                     .then((response) => {
-                        this.petitions = response.data;
+                        this.allPetitions = response.data;
+                        this.total = response.data.length;
+                        this.changePage(this.page);
                     })
                     .catch((error) => {
                         this.error = error;
@@ -222,8 +312,21 @@
                     });
 
                 }
+            },
+            changePage: function(num) {
+                this.page = num;
+                let count = 10;
+                let start = (count * (this.page - 1));
+                this.numPages = Math.ceil(this.total/count);
+                this.petitions = this.allPetitions.slice(start, (start + count));
             }
         }
     };
 </script>
 
+<style>
+    .btn:focus, .btn:active {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+</style>

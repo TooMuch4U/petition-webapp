@@ -6,7 +6,7 @@
                 <div class="col-6 offset-3">
                     <h4>Register</h4>
                     <div class="alert alert-danger" v-if="errorFlag">
-                        <strong>Error!</strong> {{ this.error }}
+                         {{ this.error }}
                     </div>
                         <div class="form-group row">
                             <label for="name" class="col-sm-2 col-form-label">Name<span class="text-danger">*</span></label>
@@ -124,8 +124,7 @@
                             this.$router.push('/').catch((err) => {});
                         })
                         .catch((err) => {
-                            alert(err)
-                            this.error = err;
+                            this.error = err.response.statusText;
                             this.errorFlag = true;
                         });
                 }
@@ -136,6 +135,7 @@
                         this.token = response.data.token;
                         this.$cookies.set('token', response.data.token);
                         this.$cookies.set('userId', response.data.userId);
+                        this.$parent.forceRerender();``
                         if (this.file != null) {
                             this.uploadPhoto();
                         }
